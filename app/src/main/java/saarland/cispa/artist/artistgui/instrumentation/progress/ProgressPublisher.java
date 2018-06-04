@@ -47,6 +47,8 @@ public class ProgressPublisher implements ProgressListener {
             "saarland.cispa.artist.artistgui.action.INSTRUMENTATION_RESULT";
     public static final String EXTRA_INSTRUMENTATION_RESULT =
             "saarland.cispa.artist.artistgui.extra.INSTRUMENTATION_RESULT";
+    public static final String EXTRA_MODULES =
+            "saarland.cispa.artist.artistgui.extra.INSTRUMENTATION_MODULES";
 
     /**
      * Instrumentation removed action
@@ -87,19 +89,22 @@ public class ProgressPublisher implements ProgressListener {
     }
 
     @Override
-    public void onSuccess(@NonNull String packageName) {
-        reportResult(packageName, true);
+    public void onSuccess(@NonNull String packageName, @NonNull String[] modules) {
+        reportResult(packageName, true, modules);
     }
 
     @Override
     public void onFailure(@NonNull String packageName) {
-        reportResult(packageName, false);
+        reportResult(packageName, false, null);
     }
 
-    private void reportResult(@NonNull String packageName, boolean isSuccess) {
+    private void reportResult(@NonNull String packageName, boolean isSuccess, String[] modules) {
         Intent intent = new Intent(ACTION_INSTRUMENTATION_RESULT);
         intent.putExtra(EXTRA_PACKAGE_NAME, packageName);
         intent.putExtra(EXTRA_INSTRUMENTATION_RESULT, isSuccess);
+        if (modules != null) {
+            intent.putExtra(EXTRA_MODULES, modules);
+        }
         mBroadcastManager.sendBroadcast(intent);
     }
 }

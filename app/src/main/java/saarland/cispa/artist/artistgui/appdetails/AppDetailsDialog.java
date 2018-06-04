@@ -78,7 +78,8 @@ public class AppDetailsDialog extends DialogFragment implements AppDetailsDialog
                     ProgressPublisher.ACTION_INSTRUMENTATION_RESULT.equals(intent.getAction())) {
                 boolean isSuccess = intent
                         .getBooleanExtra(ProgressPublisher.EXTRA_INSTRUMENTATION_RESULT, false);
-                mPresenter.handleInstrumentationResult(isSuccess);
+                String modules[] = intent.getStringArrayExtra(ProgressPublisher.EXTRA_MODULES);
+                mPresenter.handleInstrumentationResult(isSuccess, modules);
             }
         }
     };

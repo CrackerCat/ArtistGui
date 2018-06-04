@@ -1,3 +1,5 @@
+package saarland.cispa.artist.artistgui.modules.importer;
+
 /*
  * The ARTist Project (https://artist.cispa.saarland)
  *
@@ -16,19 +18,9 @@
  * limitations under the License.
  *
  */
+public class IllegalModulePackageNameException extends Exception {
 
-package saarland.cispa.artist.artistgui.instrumentation.progress;
-
-import android.support.annotation.NonNull;
-
-public interface ProgressListener {
-    void prepareReporter();
-
-    void reportProgressStage(@NonNull String packageName, int progress, @NonNull final String stage);
-
-    void reportProgressDetails(@NonNull String packageName, @NonNull final String message);
-
-    void onSuccess(@NonNull String packageName, @NonNull String[] modules);
-
-    void onFailure(@NonNull String packageName);
+    public IllegalModulePackageNameException(String message) {
+        super(message);
+    }
 }

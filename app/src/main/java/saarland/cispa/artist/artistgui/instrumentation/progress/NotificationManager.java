@@ -78,7 +78,7 @@ public class NotificationManager implements ProgressListener {
     }
 
     @Override
-    public void onSuccess(@NonNull String packageName) {
+    public void onSuccess(@NonNull String packageName, @NonNull String[] modules) {
         dismissNotification();
     }
 

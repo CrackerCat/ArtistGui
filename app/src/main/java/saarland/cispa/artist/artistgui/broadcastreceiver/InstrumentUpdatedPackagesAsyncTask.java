@@ -41,7 +41,8 @@ class InstrumentUpdatedPackagesAsyncTask extends AsyncTask<String, Void, Void> {
         String packageName = packages[0];
         Package app = getPackage(packageName);
         if (app != null && app.keepInstrumented) {
-            startService(packageName);
+            String[] modulePackageName = (String[]) app.getModulesAsList().toArray();
+            startService(packageName, modulePackageName);
         }
         return null;
     }
@@ -51,9 +52,11 @@ class InstrumentUpdatedPackagesAsyncTask extends AsyncTask<String, Void, Void> {
         return dao.get(packageName);
     }
 
-    private void startService(@NonNull String packageName) {
+    private void startService(@NonNull String packageName, @NonNull String[] modulePackageNames) {
         Intent serviceIntent = new Intent(appContext, InstrumentationService.class);
         serviceIntent.putExtra(InstrumentationService.INTENT_KEY_APP_NAME, packageName);
+        serviceIntent.putExtra(InstrumentationService.INTENT_KEY_MODULE_PACKAGE_NAMES,
+                modulePackageNames);
         appContext.startService(serviceIntent);
     }
 }

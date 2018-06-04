@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "384a381088606777b2d6ebdf34a37894",
+    "identityHash": "e0d7448ace1c22dca69439d9bada21f9",
     "entities": [
       {
         "tableName": "instrumented_packages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`package_name` TEXT NOT NULL, `last_instrumentation_timestamp` INTEGER NOT NULL, `keep_instrumented` INTEGER NOT NULL, PRIMARY KEY(`package_name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`package_name` TEXT NOT NULL, `last_instrumentation_timestamp` INTEGER NOT NULL, `keep_instrumented` INTEGER NOT NULL, `modules` TEXT, PRIMARY KEY(`package_name`))",
         "fields": [
           {
             "fieldPath": "packageName",
@@ -25,6 +25,12 @@
             "columnName": "keep_instrumented",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "modules",
+            "columnName": "modules",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -83,7 +89,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"384a381088606777b2d6ebdf34a37894\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"e0d7448ace1c22dca69439d9bada21f9\")"
     ]
   }
 }

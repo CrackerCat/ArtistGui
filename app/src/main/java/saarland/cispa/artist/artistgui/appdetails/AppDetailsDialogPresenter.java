@@ -167,11 +167,13 @@ public class AppDetailsDialogPresenter implements AppDetailsDialogContract.Prese
     }
 
     @Override
-    public void handleInstrumentationResult(boolean isSuccess) {
+    public void handleInstrumentationResult(boolean isSuccess, String[] modules) {
         if (isSuccess) {
             boolean wasInstrumented = mSelectedPackage.lastInstrumentationTimestamp != 0;
 
             mSelectedPackage.lastInstrumentationTimestamp = System.currentTimeMillis();
+            mSelectedPackage.addModules(modules);
+
             String dateAndTime = convertTimestampToDateAndTime(mSelectedPackage
                     .lastInstrumentationTimestamp);
             mView.setLastInstrumentationText(dateAndTime);

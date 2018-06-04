@@ -19,6 +19,8 @@
 
 package saarland.cispa.artist.artistgui.modules.importer;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,6 +29,8 @@ import saarland.cispa.artist.artistgui.database.Module;
 class ZipManifestParser {
 
     public static class ParseThread extends Thread {
+
+        public static final String TAG = "ParseThread";
 
         private String mManifestJson;
         private Module mResult;
@@ -45,6 +49,8 @@ class ZipManifestParser {
                 mResult = parse(mManifestJson);
             } catch (JSONException e) {
                 // Ignore exception. mResult will be null.
+            } catch (IllegalModulePackageNameException e) {
+                Log.e(TAG, "Module has illegal package name: " + e.getMessage());
             }
         }
 
@@ -60,9 +66,15 @@ class ZipManifestParser {
     private static final String AUTHOR_ELEMENT = "author";
     private static final String VERSION_ELEMENT = "version";
 
-    private static Module parse(String jsonString) throws JSONException {
+    private static Module parse(String jsonString) throws JSONException,
+            IllegalModulePackageNameException {
         JSONObject root = new JSONObject(jsonString);
+
         String packageName = root.getString(PACKAGE_NAME_ELEMENT);
+        if (!packageName.matches("\\w[.\\w]*")) {
+            throw new IllegalModulePackageNameException(packageName);
+        }
+
         String name = root.getString(NAME_ELEMENT);
         String description = root.getString(DESCRIPTION_ELEMENT);
         String author = root.getString(AUTHOR_ELEMENT);

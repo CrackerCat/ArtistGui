@@ -27,7 +27,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 @Entity(tableName = "instrumented_packages")
 public class Package implements Parcelable {
@@ -42,6 +44,14 @@ public class Package implements Parcelable {
 
     @ColumnInfo(name = "keep_instrumented")
     public boolean keepInstrumented;
+
+    // module package names seperated by ','
+    // This field is only for the db
+    @ColumnInfo(name = "modules")
+    public String modules;
+
+    @Ignore
+    private List<String> cachedModulesList;
 
     // Non db fields
     public static final Comparator<Package> sComparator =
@@ -95,6 +105,7 @@ public class Package implements Parcelable {
         appIconId = in.readInt();
         lastInstrumentationTimestamp = in.readLong();
         keepInstrumented = in.readByte() == 1;
+        modules = in.readString();
     }
 
     @Override
@@ -110,6 +121,7 @@ public class Package implements Parcelable {
         dest.writeInt(appIconId);
         dest.writeLong(lastInstrumentationTimestamp);
         dest.writeByte((byte) (keepInstrumented ? 1 : 0));
+        dest.writeString(modules);
     }
 
     @Override
@@ -139,4 +151,54 @@ public class Package implements Parcelable {
         lastInstrumentationTimestamp = 0;
         keepInstrumented = false;
     }
+
+    private void buildCachedModuleList() {
+        if (cachedModulesList == null && modules != null && !modules.isEmpty()) {
+            String[] result = modules.contains(",") ?
+                    modules.split(",") : new String[]{modules};
+            cachedModulesList = Arrays.asList(result);
+        }
+    }
+
+    public List<String> getModulesAsList() {
+        buildCachedModuleList();
+        return cachedModulesList;
+    }
+
+    public void addModules(String[] packageNames) {
+        buildCachedModuleList();
+
+        final List<String> currentModules = cachedModulesList;
+        for (String name : packageNames) {
+            if (!currentModules.contains(name)) {
+                currentModules.add(name);
+            }
+        }
+        updateModulesDBString();
+    }
+
+    public void removeModules(List<String> modules) {
+        buildCachedModuleList();
+        cachedModulesList.removeAll(modules);
+        updateModulesDBString();
+    }
+
+    private void updateModulesDBString() {
+        buildCachedModuleList();
+        final List<String> cachedModules = cachedModulesList;
+
+        final int size = cachedModules.size();
+        if (size == 1) modules = cachedModules.get(0);
+        else if (size > 0) {
+            StringBuilder builder = new StringBuilder(cachedModules.get(0));
+            // Loop starts from second value
+            for (int i = 1; i < size; i++) {
+                builder.append(",")
+                        .append(cachedModules.get(i));
+            }
+            modules = builder.toString();
+        }
+        throw new IllegalStateException("No packageName passed to addModules()");
+    }
+
 }

@@ -39,6 +39,7 @@ class InstrumentationTask implements Runnable {
     private ArtistRunConfig mRunConfig;
     private List<ProgressListener> mProgressListeners;
     private InstrumentationStages mInstrumenationStages;
+    private String[] mModules;
 
     InstrumentationTask(@NonNull Context context, @NonNull ArtistRunConfig runConfig,
                         @NonNull String[] modules, @NonNull List<ProgressListener> listeners) {
@@ -46,6 +47,7 @@ class InstrumentationTask implements Runnable {
         mProgressListeners = listeners;
         mInstrumenationStages = new InstrumentationStagesImpl(context, mRunConfig, modules,
                 mProgressListeners);
+        mModules = modules;
     }
 
     @Override
@@ -98,7 +100,7 @@ class InstrumentationTask implements Runnable {
 
     private void reportResult(boolean isSuccess) {
         for (ProgressListener listener : mProgressListeners) {
-            if (isSuccess) listener.onSuccess(mRunConfig.app_package_name);
+            if (isSuccess) listener.onSuccess(mRunConfig.app_package_name, mModules);
             else listener.onFailure(mRunConfig.app_package_name);
         }
     }

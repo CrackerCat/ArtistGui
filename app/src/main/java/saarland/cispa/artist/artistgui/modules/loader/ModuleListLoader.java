@@ -22,16 +22,26 @@ package saarland.cispa.artist.artistgui.modules.loader;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
+import org.spongycastle.math.raw.Mod;
+
 import java.util.List;
 
 import saarland.cispa.artist.artistgui.Application;
 import saarland.cispa.artist.artistgui.database.Module;
 import saarland.cispa.artist.artistgui.database.ModuleDao;
+import saarland.cispa.artist.artistgui.database.Package;
 
 public class ModuleListLoader extends AsyncTaskLoader<List<Module>> {
 
     private ModuleDao mModuleDao;
     private List<Module> mCachedResult;
+
+    private Package mApp;
+
+    public ModuleListLoader(Context context, Package app) {
+        super(context);
+        mApp = app;
+    }
 
     public ModuleListLoader(Context context) {
         super(context);
@@ -54,7 +64,16 @@ public class ModuleListLoader extends AsyncTaskLoader<List<Module>> {
 
     @Override
     public List<Module> loadInBackground() {
-        return mModuleDao.getAll();
+        List<Module> installedModules = mModuleDao.getAll();
+        List<String> appModules = mApp.getModulesAsList();
+        if (!appModules.isEmpty()) {
+            for (Module installedModule : installedModules) {
+                if (appModules.contains(installedModule.packageName)) {
+                    installedModule.isSelected = true;
+                }
+            }
+        }
+        return installedModules;
     }
 
     @Override

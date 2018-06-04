@@ -53,6 +53,9 @@ public class Module {
     @Ignore
     public boolean isUpdating;
 
+    @Ignore
+    public boolean isSelected;
+
     public Module(@NonNull String packageName, @NonNull String name, @NonNull String description,
                   @NonNull String author, int version) {
         this.packageName = packageName;

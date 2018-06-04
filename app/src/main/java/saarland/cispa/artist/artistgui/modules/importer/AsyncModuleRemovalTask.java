@@ -24,10 +24,16 @@ import android.os.AsyncTask;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import saarland.cispa.artist.artistgui.Application;
+import saarland.cispa.artist.artistgui.database.AppDatabase;
 import saarland.cispa.artist.artistgui.database.Module;
 import saarland.cispa.artist.artistgui.database.ModuleDao;
+import saarland.cispa.artist.artistgui.database.Package;
+import saarland.cispa.artist.artistgui.database.PackageDao;
 import saarland.cispa.artist.artistgui.modules.ModuleContract;
 import saarland.cispa.artist.artistgui.utils.FileUtils;
 
@@ -47,14 +53,24 @@ public class AsyncModuleRemovalTask extends AsyncTask<Module, Void, Module[]> {
     protected Module[] doInBackground(Module... modules) {
         File modulesDir = mApplication.getDir(MODULES_DIR, Context.MODE_PRIVATE);
 
+        List<String> modulePackageName = new ArrayList<>();
         for (Module module : modules) {
+            modulePackageName.add(module.packageName);
             File mDir = new File(modulesDir, module.packageName);
             FileUtils.delete(mDir);
         }
 
         // Remove from db
-        ModuleDao moduleDao = mApplication.getDatabase().moduleDao();
+        final AppDatabase database = mApplication.getDatabase();
+        ModuleDao moduleDao = database.moduleDao();
         moduleDao.delete(modules);
+
+        // Remove from app entries
+        PackageDao packageDao = database.packageDao();
+        List<Package> packageList = packageDao.getAll();
+        for (Package p : packageList) {
+            p.removeModules(modulePackageName);
+        }
         return modules;
     }
 

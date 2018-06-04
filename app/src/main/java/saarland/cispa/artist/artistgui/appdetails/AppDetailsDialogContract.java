@@ -55,7 +55,7 @@ interface AppDetailsDialogContract {
 
         void removeInstrumentation();
 
-        void handleInstrumentationResult(boolean isSuccess);
+        void handleInstrumentationResult(boolean isSuccess, String[] modules);
 
         void saveInstanceState(Bundle outState);
 
